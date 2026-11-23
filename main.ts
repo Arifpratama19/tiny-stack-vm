@@ -3,7 +3,8 @@ import{join}from"node:path";
 const Y=new Array(84).fill(0);Y[1]=1;Y[2]=4;Y[48]=Y[49]=Y[50]=Y[51]=2;
 const P=new Array(84).fill(2);P[0]=P[1]=P[2]=P[48]=P[51]=P[52]=P[82]=0;P[3]=P[4]=P[23]=P[27]=P[49]=P[50]=P[64]=P[80]=P[81]=P[83]=1;P[7]=3;
 const U=new Array(84).fill(1);U[0]=U[3]=U[48]=U[49]=U[50]=U[51]=U[52]=U[65]=U[80]=U[81]=U[83]=0;U[4]=U[5]=2;U[6]=U[7]=3;
-const E=new TextEncoder();
+const V=new Uint8Array(84);
+for(let i=0;i<84;i++)V[i]=i<8||i>15&&i<31||i>31&&i<35||i>47&&i<53||i>63&&i<66||i>79?1:0;
 function run(p,q){
  const n=p.length,D=new Int32Array(256),C=new Int32Array(64),M=new Int32Array(256),O=new Uint8Array(65536);
  let s=0,c=0,l=0,g=0,pc=0,t=0;
@@ -12,7 +13,7 @@ function run(p,q){
   if(t==1e6)return F(10);
   if(pc<0||pc>=n)return F(9);
   const op=p[pc];
-  if(op>83||op>7&&op<16||op==31||op>34&&op<48||op>52&&op<64||op>65&&op<80)return F(5);
+  if(!V[op])return F(5);
   const m=Y[op];
   if(pc+m>=n)return F(9);
   t++;
@@ -47,7 +48,7 @@ function run(p,q){
    case 52:if(!c)return F(8);pc=C[--c];break;
    case 64:{const a=D[s-1];if(a<0||a>255)return F(6);D[s-1]=M[a];break;}
    case 65:{const a=D[s-1];if(a<0||a>255)return F(6);s-=2;M[a]=D[s];break;}
-   case 80:{const b=E.encode(String(D[s-1]));if(l+b.length>65536)return F(11);s--;O.set(b,l);l+=b.length;break;}
+   case 80:{const v=D[s-1];let x=v<0?-v:v,d=1;for(let y=x;y>=10;y=(y/10)|0)d++;if(v<0)d++;if(l+d>65536)return F(11);s--;let i=l+d;do{O[--i]=48+x%10;x=(x/10)|0;}while(x);if(v<0)O[l]=45;l+=d;break;}
    case 81:if(l+1>65536)return F(11);O[l++]=D[--s]&255;break;
    case 82:D[s++]=g<q.length?q[g++]:-1;break;
    case 83:return F(D[--s]&255);
